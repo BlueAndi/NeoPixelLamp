@@ -3,11 +3,11 @@
 A lamp with some NeoPixels and a 3D accelerometer, 3D gyroscope and 3D magnetometer.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://choosealicense.com/licenses/mit/)
-[![Release](https://img.shields.io/github/release/BlueAndi/NeoPixelFun.svg)](https://github.com/BlueAndi/NeoPixelFun/releases)
+[![Release](https://img.shields.io/github/release/BlueAndi/NeoPixelLamp.svg)](https://github.com/BlueAndi/NeoPixelLamp/releases)
 
-1. [Description](https://github.com/BlueAndi/NeoPixelFun#description)
-2. [Issues, Ideas and bugs](https://github.com/BlueAndi/NeoPixelFun#issues-ideas-and-bugs)
-3. [License](https://github.com/BlueAndi/NeoPixelFun#license)
+1. [Description](https://github.com/BlueAndi/NeoPixelLamp#description)
+2. [Issues, Ideas and bugs](https://github.com/BlueAndi/NeoPixelLamp#issues-ideas-and-bugs)
+3. [License](https://github.com/BlueAndi/NeoPixelLamp#license)
 
 ##Description
 
@@ -30,7 +30,7 @@ Have fun!
 
 ##Issues, Ideas and bugs
 
-If you have further ideas or you found some bugs, great! Create a [issue](https://github.com/BlueAndi/NeoPixelFun/issues) or if
+If you have further ideas or you found some bugs, great! Create a [issue](https://github.com/BlueAndi/NeoPixelLamp/issues) or if
 you are able and willing to fix it by yourself, clone the repository and create a pull request.
 
 ##License
