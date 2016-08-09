@@ -20,6 +20,7 @@ Turn the lamp about 90 degree and rotate it to increase or decrease the LED brig
 Turn the lamp about 180 degree it will jump into deep standby.
 
 Implemented programs:
+
 1. Rainbow colors
 2. Theatre-style crawling lights with rainbow effect
 3. Color changes dependen on the temperature
