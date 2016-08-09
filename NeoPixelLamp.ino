@@ -40,7 +40,7 @@
  * 
  * Shake the lamp according to the z-axis to switch between different programs.
  * Turn the lamp about 90 degree and rotate it to increase or decrease the LED brightness.
- * Turn the lamp about 180 degree it will jump into deep standby.
+ * Turn the lamp about 180 degree and it will jump into deep standby.
  *
  * Implemented programs:
  * 1. Rainbow colors
