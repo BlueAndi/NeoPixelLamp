@@ -35,9 +35,9 @@
  *
  * @section desc Description
  * This arduino sketch controls a lamp with
- * - an Adafruit Flora V2 (https://www.adafruit.com/products/659),
- * - an Adafruit NeoPixel ring (https://www.adafruit.com/product/1463) and
- * - an Adafruit acceleration/magnetic/gyroscope sensor (https://www.adafruit.com/product/2020).
+ * - an Adafruit FLORA V2 (https://www.adafruit.com/products/659),
+ * - an Adafruit NeoPixel Ring - 16 (https://www.adafruit.com/product/1463) and
+ * - an Adafruit FLORA 9-DOF Accelerometer/Gyroscope/Magnetometer - LSM9DS0 - v1.0 (https://www.adafruit.com/product/2020).
  * 
  * Shake the lamp according to the z-axis to switch between different programs.
  * Turn the lamp about 90 degree and rotate it to increase or decrease the LED brightness.
