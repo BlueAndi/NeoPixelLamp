@@ -13,8 +13,10 @@ A lamp with some NeoPixels and a 3D accelerometer, 3D gyroscope and 3D magnetome
 
 This arduino sketch controls a lamp with
 * an [Adafruit FLORA V2](https://www.adafruit.com/products/659),
-* an [Adafruit NeoPixel ring](https://www.adafruit.com/product/1463) and
-* an [Adafruit FLORA 9-DOF Accelerometer/Gyroscope/Magnetometer - LSM9DS0 - v1.0](https://www.adafruit.com/product/2020).
+* an [Adafruit NeoPixel Ring - 16](https://www.adafruit.com/product/1463),
+* an [Adafruit FLORA 9-DOF Accelerometer/Gyroscope/Magnetometer - LSM9DS0 - v1.0](https://www.adafruit.com/product/2020),
+* an [Sparkfun USB LiPoly Charger - Single Cell](https://www.sparkfun.com/products/12711) and
+* a LiPo Akku with 400mAh.
 
 Shake the lamp according to the z-axis to switch between different programs.
 Turn the lamp about 90 degree and rotate it to increase or decrease the LED brightness.
