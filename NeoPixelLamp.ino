@@ -35,6 +35,7 @@
  *
  * @section desc Description
  * This arduino sketch controls a lamp with
+ * - an Adafruit Flora V2 (https://www.adafruit.com/products/659),
  * - an Adafruit NeoPixel ring (https://www.adafruit.com/product/1463) and
  * - an Adafruit acceleration/magnetic/gyroscope sensor (https://www.adafruit.com/product/2020).
  * 
