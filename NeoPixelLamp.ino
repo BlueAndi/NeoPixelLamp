@@ -1,6 +1,6 @@
 /* The MIT License (MIT)
  *
- * Copyright (c) 2016, Andreas Merkle
+ * Copyright (c) 2016 - 2017, Andreas Merkle
  * http://www.blue-andi.de
  * web@blue-andi.de
  *
