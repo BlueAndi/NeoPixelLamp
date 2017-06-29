@@ -1,4 +1,4 @@
-#NeoPixelLamp
+# NeoPixelLamp
 
 A lamp with some NeoPixels and a 3D accelerometer, 3D gyroscope and 3D magnetometer.
 
@@ -9,7 +9,7 @@ A lamp with some NeoPixels and a 3D accelerometer, 3D gyroscope and 3D magnetome
 2. [Issues, Ideas and bugs](https://github.com/BlueAndi/NeoPixelLamp#issues-ideas-and-bugs)
 3. [License](https://github.com/BlueAndi/NeoPixelLamp#license)
 
-##Description
+## Description
 
 This arduino sketch controls a lamp with
 * an [Adafruit FLORA V2](https://www.adafruit.com/products/659),
@@ -38,10 +38,10 @@ Used 3rd party libraries:
 
 Have fun!
 
-##Issues, Ideas and bugs
+## Issues, Ideas and bugs
 
 If you have further ideas or you found some bugs, great! Create a [issue](https://github.com/BlueAndi/NeoPixelLamp/issues) or if
 you are able and willing to fix it by yourself, clone the repository and create a pull request.
 
-##License
+## License
 The whole source code is published under the [MIT license](http://choosealicense.com/licenses/mit/).
