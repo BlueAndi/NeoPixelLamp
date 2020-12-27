@@ -8,6 +8,7 @@ A lamp with some NeoPixels and a 3D accelerometer, 3D gyroscope and 3D magnetome
 1. [Description](https://github.com/BlueAndi/NeoPixelLamp#description)
 2. [Issues, Ideas and bugs](https://github.com/BlueAndi/NeoPixelLamp#issues-ideas-and-bugs)
 3. [License](https://github.com/BlueAndi/NeoPixelLamp#license)
+4. [Contribution](https://github.com/BlueAndi/NeoPixelLamp#contribution)
 
 ## Description
 
@@ -45,3 +46,7 @@ you are able and willing to fix it by yourself, clone the repository and create 
 
 ## License
 The whole source code is published under the [MIT license](http://choosealicense.com/licenses/mit/).
+
+## Contribution
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, shall be licensed as above, without any
+additional terms or conditions.
