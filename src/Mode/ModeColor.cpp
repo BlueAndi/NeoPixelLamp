@@ -90,7 +90,10 @@ public:
 private:
     uint8_t m_colorWheelIndex; /**< Color wheel index. */
 
+    /** Copy constructor now allowed. */
     ModeColorState(const ModeColorState& other);
+
+    /** Assignment operator now allowed. */
     ModeColorState& operator=(const ModeColorState& other);
 
     /**

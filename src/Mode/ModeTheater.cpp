@@ -94,7 +94,10 @@ private:
     uint8_t m_colorWheelIndex; /**< Color wheel index. */
     uint8_t m_onIndex;         /**< Index decides whether LED is on. */
 
+    /** Copy constructor now allowed. */
     ModeTheaterState(const ModeTheaterState& other);
+
+    /** Assignment operator now allowed. */
     ModeTheaterState& operator=(const ModeTheaterState& other);
 
     /**

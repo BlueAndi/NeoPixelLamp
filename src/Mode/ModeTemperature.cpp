@@ -99,7 +99,10 @@ private:
     int8_t  m_temperatures[AVERAGE_COUNT]; /**< Temperatures used for average calculation. */
     uint8_t m_wrIndex;                     /**< Write index in the temperature array. */
 
+    /** Copy constructor now allowed. */
     ModeTemperatureState(const ModeTemperatureState& other);
+
+    /** Assignment operator now allowed. */
     ModeTemperatureState& operator=(const ModeTemperatureState& other);
 
     /**

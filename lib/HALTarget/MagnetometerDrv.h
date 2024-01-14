@@ -108,7 +108,7 @@ public:
      * If the offset compensation is enabled, they will be considered for
      * all 3 axis.
      *
-     * @param[out]  3-axis magnetic vector in gauss
+     * @param[out] magnetic 3-axis magnetic vector in gauss.
      */
     void getMagnetic(sensors_vec_t& magnetic);
 
@@ -131,8 +131,13 @@ private:
     bool             m_isOffsetCompensationEnabled; /**< Is offset compensation enabled? */
     sensors_vec_t    m_offset;                      /**< Offset for offset compensation. */
 
+    /** Default constructor not allowed. */
     MagnetometerDrv();
+
+    /** Copy constructor not allowed. */
     MagnetometerDrv(const MagnetometerDrv& other);
+
+    /** Assignment operator not allowed. */
     MagnetometerDrv& operator=(const MagnetometerDrv& other);
 };
 

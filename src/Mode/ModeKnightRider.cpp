@@ -107,7 +107,10 @@ private:
     uint8_t   m_retPosition;     /**< Return position, where the direction changes. */
     Direction m_direction;       /**< Direction */
 
+    /** Copy constructor now allowed. */
     ModeKnightRiderState(const ModeKnightRiderState& other);
+
+    /** Assignment operator now allowed. */
     ModeKnightRiderState& operator=(const ModeKnightRiderState& other);
 };
 

@@ -108,7 +108,7 @@ public:
      * If the offset compensation is enabled, they will be considered for
      * all 3 axis.
      *
-     * @param[out]  3-axis gyroscope vector in degree/s
+     * @param[out] gyro 3-axis gyroscope vector in degree/s.
      */
     void getGyro(sensors_vec_t& gyro);
 
@@ -117,8 +117,13 @@ private:
     bool             m_isOffsetCompensationEnabled; /**< Is offset compensation enabled? */
     sensors_vec_t    m_offset;                      /**< Offset for offset compensation. */
 
+    /** Default constructor not allowed. */
     GyroscopeDrv();
+
+    /** Copy constructor not allowed. */
     GyroscopeDrv(const GyroscopeDrv& other);
+
+    /** Assingment operator not allowed. */
     GyroscopeDrv& operator=(const GyroscopeDrv& other);
 };
 

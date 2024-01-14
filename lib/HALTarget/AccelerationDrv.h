@@ -108,7 +108,7 @@ public:
      * If the offset compensation is enabled, they will be considered for
      * all 3 axis.
      *
-     * @param[out]  3-axis acceleration vector in m/s^2
+     * @param[out] acceleration 3-axis acceleration vector in m/s^2
      */
     void getAcceleration(sensors_vec_t& acceleration);
 
@@ -121,7 +121,7 @@ public:
      * If the offset compensation is enabled, they will be considered for
      * all 3 axis.
      * 
-     * @param[in] acceleration  3-axis acceleration vector.
+     * @param[in] acceleration  3-axis acceleration vector in m/s^2
      *
      * @return Absolute acceleration value in m/s^2.
      */
@@ -132,8 +132,13 @@ private:
     bool             m_isOffsetCompensationEnabled; /**< Is offset compensation enabled? */
     sensors_vec_t    m_offset;                      /**< Offset for offset compensation. */
 
+    /** Default constructor not allowed. */
     AccelerationDrv();
+
+    /** Copy constructor not allowed. */
     AccelerationDrv(const AccelerationDrv& other);
+
+    /** Assignment operator not allowed. */
     AccelerationDrv& operator=(const AccelerationDrv& other);
 };
 
