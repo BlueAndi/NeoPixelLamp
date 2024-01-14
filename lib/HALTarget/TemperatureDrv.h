@@ -84,8 +84,13 @@ public:
 private:
     Adafruit_Sensor& m_sensor; /**< Temperature sensor */
 
+    /** Default constructor not allowed. */
     TemperatureDrv();
+
+    /** Copy constructor not allowed. */
     TemperatureDrv(const TemperatureDrv& other);
+
+    /** Assignment operator not allowed. */
     TemperatureDrv& operator=(const TemperatureDrv& other);
 };
 

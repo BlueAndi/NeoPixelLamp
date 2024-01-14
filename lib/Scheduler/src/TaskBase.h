@@ -72,8 +72,6 @@ public:
 
     /**
      * Task function which is defined by the user.
-     *
-     * @param[in] par   Task function specific parameter.
      */
     typedef void (*TaskFunc)(void* par);
 
