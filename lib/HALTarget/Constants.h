@@ -77,13 +77,13 @@ namespace Constants
     /** Default brightness of the pixels. */
     constexpr uint8_t neoPixelDefaultBrightness = 120U;
 
-    /** Earth gravity acceleration in m/s^2 */
-    constexpr float earthGravity = 9.81F;
+    /** Earth gravity acceleration in m/s^2. */
+    constexpr float earthGravity = 9.8067F;
 
     /** Max. temperature in degree celsius of the temperature sensor. */
     constexpr float temperatureMax = 85.0F;
 
-    /** Min. temperature in degree celsius of the temperature sensor */
+    /** Min. temperature in degree celsius of the temperature sensor. */
     constexpr float temperatureMin = -40.0F;
 
 }; /* namespace Constants */
