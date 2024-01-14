@@ -2,6 +2,8 @@
 
 A lamp with some NeoPixels and a 3D-accelerometer, 3D-gyroscope and 3D-magnetometer.
 
+![NeoPixelLamp](./doc/NeoPixelLamp.jpg)
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://choosealicense.com/licenses/mit/)
 [![Repo Status](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Release](https://img.shields.io/github/release/BlueAndi/NeoPixelLamp.svg)](https://github.com/BlueAndi/NeoPixelLamp/releases)
