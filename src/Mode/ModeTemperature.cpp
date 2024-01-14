@@ -51,7 +51,7 @@
  *****************************************************************************/
 
 /**
- * This class handles mode Theater within a state machine.
+ * This class handles mode Temperature animation within a state machine.
  * It shows the color dependend on the measured temperature.
  */
 class ModeTemperatureState : public IState

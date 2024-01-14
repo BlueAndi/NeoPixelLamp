@@ -43,8 +43,8 @@
  * Includes
  *****************************************************************************/
 #include <stdint.h>
-#include <Adafruit_NeoPixel.h> /* Adafruit NeoPixel ring library */
-#include <Adafruit_LSM9DS0.h>  /* Adafruit triple-axis accelerometer/magnetometer/gyroscope LSM9DS0 library */
+#include <Adafruit_NeoPixel.h>
+#include <Adafruit_LSM9DS0.h>
 
 #include "AccelerationDrv.h"
 #include "GyroscopeDrv.h"
@@ -158,10 +158,10 @@ public:
 private:
     Adafruit_LSM9DS0  m_magneticSensorDrv; /**< LSM9DS0 magnetic sensor driver, I2C address 0xD4. */
     Adafruit_NeoPixel m_neoPixel;          /**< NeoPixel strip driver. */
-    AccelerationDrv   m_accDrv;            /**< Acceleration driver. */
-    GyroscopeDrv      m_gyroDrv;           /**< Gyrosecope driver. */
-    MagnetometerDrv   m_magDrv;            /**< Magnetometer driver. */
-    TemperatureDrv    m_tmpDrv;            /**< Temperature driver. */
+    AccelerationDrv   m_accDrv;            /**< Acceleration driver which uses the LSM9DS0. */
+    GyroscopeDrv      m_gyroDrv;           /**< Gyroscope driver which uses the LSM9DS0. */
+    MagnetometerDrv   m_magDrv;            /**< Magnetometer driver which uses the LSM9DS0. */
+    TemperatureDrv    m_tmpDrv;            /**< Temperature driver which uses the LSM9DS0. */
 
     /**
      * Constructs the concrete board.

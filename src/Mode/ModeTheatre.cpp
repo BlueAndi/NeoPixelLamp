@@ -25,14 +25,14 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Mode: Theater
+ * @brief  Mode: Theatre
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include "ModeTheater.h"
+#include "ModeTheatre.h"
 #include <Board.h>
 
 #include "ColorWheel.h"
@@ -50,23 +50,23 @@
  *****************************************************************************/
 
 /**
- * This class handles mode Theater within a state machine.
- * It shows theater-style crawling lights with rainbow effect.
+ * This class handles mode Theatre within a state machine.
+ * It shows theatre-style crawling lights with rainbow effect.
  */
-class ModeTheaterState : public IState
+class ModeTheatreState : public IState
 {
 public:
     /**
      * Construct the mode.
      */
-    ModeTheaterState() : IState(), m_colorWheelIndex(0U), m_onIndex(0U)
+    ModeTheatreState() : IState(), m_colorWheelIndex(0U), m_onIndex(0U)
     {
     }
 
     /**
      * Destroy the mode.
      */
-    ~ModeTheaterState()
+    ~ModeTheatreState()
     {
     }
 
@@ -95,10 +95,10 @@ private:
     uint8_t m_onIndex;         /**< Index decides whether LED is on. */
 
     /** Copy constructor now allowed. */
-    ModeTheaterState(const ModeTheaterState& other);
+    ModeTheatreState(const ModeTheatreState& other);
 
     /** Assignment operator now allowed. */
-    ModeTheaterState& operator=(const ModeTheaterState& other);
+    ModeTheatreState& operator=(const ModeTheatreState& other);
 
     /**
      * Show colors on pixel strip.
@@ -106,12 +106,12 @@ private:
     void show();
 };
 
-void ModeTheaterState::entry()
+void ModeTheatreState::entry()
 {
     show();
 }
 
-void ModeTheaterState::process(StateMachine& sm)
+void ModeTheatreState::process(StateMachine& sm)
 {
     Adafruit_NeoPixel& neoPixel = Board::getInstance().getPixelDrv();
     uint8_t            run;
@@ -138,7 +138,7 @@ void ModeTheaterState::process(StateMachine& sm)
     show();
 }
 
-void ModeTheaterState::exit()
+void ModeTheatreState::exit()
 {
     Adafruit_NeoPixel& neoPixel = Board::getInstance().getPixelDrv();
 
@@ -146,7 +146,7 @@ void ModeTheaterState::exit()
     neoPixel.show();
 }
 
-void ModeTheaterState::show()
+void ModeTheatreState::show()
 {
     Adafruit_NeoPixel& neoPixel = Board::getInstance().getPixelDrv();
     uint8_t            run;
@@ -169,7 +169,7 @@ void ModeTheaterState::show()
  *****************************************************************************/
 
 /** Mode instance. */
-static ModeTheaterState gMode;
+static ModeTheatreState gMode;
 
 /******************************************************************************
  * Public Methods
@@ -187,7 +187,7 @@ static ModeTheaterState gMode;
  * External Functions
  *****************************************************************************/
 
-IState* ModeTheater::getState()
+IState* ModeTheatre::getState()
 {
     return &gMode;
 }

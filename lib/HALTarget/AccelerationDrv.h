@@ -53,7 +53,10 @@
  * Types and Classes
  *****************************************************************************/
 
-/** The acceleration driver provides the current acceleration. */
+/**
+ * The acceleration driver provides the current 3-axis acceleration and
+ * absolute acceleration.
+ */
 class AccelerationDrv
 {
 public:

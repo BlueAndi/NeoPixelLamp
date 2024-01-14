@@ -53,7 +53,10 @@
  * Types and Classes
  *****************************************************************************/
 
-/** The magnetometer driver provides the current magnetometer. */
+/**
+ * The magnetometer driver provides the current 3-axis magnetic field and the
+ * derived heading.
+ */
 class MagnetometerDrv
 {
 public:

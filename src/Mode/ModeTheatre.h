@@ -25,7 +25,7 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Mode: Theater
+ * @brief  Mode: Theatre
  * @author Andreas Merkle <web@blue-andi.de>
  *
  * @addtogroup Application
@@ -33,8 +33,8 @@
  * @{
  */
 
-#ifndef MODE_THEATER_H
-#define MODE_THEATER_H
+#ifndef MODE_THEATRE_H
+#define MODE_THEATRE_H
 
 /******************************************************************************
  * Compile Switches
@@ -58,9 +58,9 @@
  *****************************************************************************/
 
 /**
- * Theater animation related.
+ * Theatre animation related.
  */
-namespace ModeTheater
+namespace ModeTheatre
 {
     /**
      * Get the state which handles the mode.
@@ -69,7 +69,7 @@ namespace ModeTheater
      */
     IState* getState();
 
-}; /* namespace ModeTheater */
+}; /* namespace ModeTheatre */
 
-#endif /* MODE_THEATER_H */
+#endif /* MODE_THEATRE_H */
 /** @} */

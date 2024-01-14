@@ -53,7 +53,9 @@
  * Types and Classes
  *****************************************************************************/
 
-/** The gyroscope driver provides the current gyroscope. */
+/**
+ * The gyroscope driver provides the current 3-axis angle velocity.
+ */
 class GyroscopeDrv
 {
 public:

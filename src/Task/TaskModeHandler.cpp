@@ -39,7 +39,7 @@
 #include <Constants.h>
 
 #include "ModeRainbow.h"
-#include "ModeTheater.h"
+#include "ModeTheatre.h"
 #include "ModeTemperature.h"
 #include "ModeColor.h"
 #include "ModeKnightRider.h"
@@ -88,7 +88,7 @@ static StateMachine gStateMachine;
 
 /** List of modes. The order is used in case the user selects the next mode. */
 static Mode gModeList[] = {{ModeRainbow::getState(), 20U},
-                           {ModeTheater::getState(), 100U},
+                           {ModeTheatre::getState(), 100U},
                            {ModeTemperature::getState(), 100U},
                            {ModeColor::getState(), 20U},
                            {ModeKnightRider::getState(), 20U}};
