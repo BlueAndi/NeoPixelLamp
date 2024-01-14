@@ -25,124 +25,118 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Main entry point
+ * @brief  Simple timer
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include <Arduino.h>
-#include <Board.h>
-#include <Scheduler.h>
-#include <Task.h>
-#include <TTask.h>
+#include "Timer.h"
 
-#include "TaskModeHandler.h"
-#include "TaskUI.h"
-#include "TaskSleep.h"
+/******************************************************************************
+ * Compiler Switches
+ *****************************************************************************/
 
 /******************************************************************************
  * Macros
  *****************************************************************************/
 
-/** 
- * For debug purposes it is better to wait for an established USB connection (1)
- * otherwise nothing will be seen in the serial console.
- * In normal mode (no debugging) without a USB connection, it must be disabled,
- * otherwise the program will hang in a infinite loop.
- */
-#define NEOPIXELLAMP_WAIT_FOR_USB 0
-
-/** Get number of elements in the given array. */
-#define ARRAY_NUM(__arr) (sizeof(__arr) / sizeof((__arr)[0]))
-
 /******************************************************************************
- * Types and Classes
+ * Types and classes
  *****************************************************************************/
 
 /******************************************************************************
  * Prototypes
  *****************************************************************************/
 
-static uint32_t getTimestamp();
-
 /******************************************************************************
- * Variables
+ * Local Variables
  *****************************************************************************/
 
-/** The list of tasks which are scheduled by the scheduler. */
-static TaskBase* gTaskList[] = {
-    TaskModeHandler::getTask(), /* Handles the selected mode. */
-    TaskUI::getTask(),          /* Handles the user interface. */
-    TaskSleep::getTask()        /* Handles the sleep mode. */
-};
-
-/** Serial baudrate. */
-static const unsigned long SERIAL_BAUDRATE = 9600U;
-
-/** The task scheduler. */
-static Scheduler gScheduler(gTaskList, ARRAY_NUM(gTaskList));
+Timer::GetTimestampFunc Timer::m_getTimestampFunc = nullptr;
 
 /******************************************************************************
- * External functions
+ * Public Methods
  *****************************************************************************/
 
-/**
- * Initialize the system.
- * This function is called once during startup.
- */
-void setup() /* cppcheck-suppress unusedFunction */
+void Timer::start(uint32_t duration)
 {
-    Board& board = Board::getInstance();
+    m_duration       = duration;
+    m_startTimestamp = getTimestamp();
+    m_isTimeout      = false;
+    m_isRunning      = true;
+}
 
-    /* Set serial baudrate */
-    Serial.begin(SERIAL_BAUDRATE);
+void Timer::restart()
+{
+    m_startTimestamp = getTimestamp();
+    m_isTimeout      = false;
+    m_isRunning      = true;
+}
 
-#if (0 != NEOPIXELLAMP_WAIT_FOR_USB)
+void Timer::stop()
+{
+    m_isTimeout = false;
+    m_isRunning = false;
+}
 
-    /* Wait for serial port to connect. Needed for native USB */
-    while (!Serial)
-        ;
+bool Timer::isRunning() const
+{
+    return m_isRunning;
+}
 
-#endif
+bool Timer::isTimeout()
+{
+    bool isTimeout = false;
 
-    Serial.println("Setup NeoPixelLamp ...");
-
-    if (false == board.init())
+    if (true == m_isRunning)
     {
-        Serial.println("Failed to initialize the hardware.");
-        delay(100U); /* Ensure that the previous printed info is transferred over serial connection. */
+        if (false == m_isTimeout)
+        {
+            uint32_t delta = getCurrentDuration();
 
-        Board::reset();
-    }
-    else
-    {
-        Serial.println("NeoPixelLamp is ready.");
+            if (m_duration <= delta)
+            {
+                m_isTimeout = true;
+            }
+        }
+
+        isTimeout = m_isTimeout;
     }
 
-    Timer::init(getTimestamp);
+    return isTimeout;
 }
 
-/**
- * Main program loop.
- * This function is called cyclic.
- */
-void loop() /* cppcheck-suppress unusedFunction */
+uint32_t Timer::getCurrentDuration() const
 {
-    gScheduler.execute();
+    return getTimestamp() - m_startTimestamp;
 }
 
 /******************************************************************************
- * Local functions
+ * Protected Methods
  *****************************************************************************/
 
-/**
- * Get current timestamp in ms.
- *
- * @return Timestamp in ms
- */
-static uint32_t getTimestamp()
+/******************************************************************************
+ * Private Methods
+ *****************************************************************************/
+
+uint32_t Timer::getTimestamp() const
 {
-    return static_cast<uint32_t>(millis());
+    uint32_t timestamp = 0U;
+
+    if (nullptr != m_getTimestampFunc)
+    {
+        timestamp = m_getTimestampFunc();
+    }
+
+    return timestamp;
 }
+
+/******************************************************************************
+ * External Functions
+ *****************************************************************************/
+
+/******************************************************************************
+ * Local Functions
+ *****************************************************************************/

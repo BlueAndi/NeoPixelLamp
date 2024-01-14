@@ -25,124 +25,100 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Main entry point
+ * @brief  Magnetometer driver
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include <Arduino.h>
-#include <Board.h>
-#include <Scheduler.h>
-#include <Task.h>
-#include <TTask.h>
+#include "MagnetometerDrv.h"
 
-#include "TaskModeHandler.h"
-#include "TaskUI.h"
-#include "TaskSleep.h"
+/******************************************************************************
+ * Compiler Switches
+ *****************************************************************************/
 
 /******************************************************************************
  * Macros
  *****************************************************************************/
 
-/** 
- * For debug purposes it is better to wait for an established USB connection (1)
- * otherwise nothing will be seen in the serial console.
- * In normal mode (no debugging) without a USB connection, it must be disabled,
- * otherwise the program will hang in a infinite loop.
- */
-#define NEOPIXELLAMP_WAIT_FOR_USB 0
-
-/** Get number of elements in the given array. */
-#define ARRAY_NUM(__arr) (sizeof(__arr) / sizeof((__arr)[0]))
-
 /******************************************************************************
- * Types and Classes
+ * Types and classes
  *****************************************************************************/
 
 /******************************************************************************
  * Prototypes
  *****************************************************************************/
 
-static uint32_t getTimestamp();
-
 /******************************************************************************
- * Variables
+ * Local Variables
  *****************************************************************************/
 
-/** The list of tasks which are scheduled by the scheduler. */
-static TaskBase* gTaskList[] = {
-    TaskModeHandler::getTask(), /* Handles the selected mode. */
-    TaskUI::getTask(),          /* Handles the user interface. */
-    TaskSleep::getTask()        /* Handles the sleep mode. */
-};
-
-/** Serial baudrate. */
-static const unsigned long SERIAL_BAUDRATE = 9600U;
-
-/** The task scheduler. */
-static Scheduler gScheduler(gTaskList, ARRAY_NUM(gTaskList));
-
 /******************************************************************************
- * External functions
+ * Public Methods
  *****************************************************************************/
 
-/**
- * Initialize the system.
- * This function is called once during startup.
- */
-void setup() /* cppcheck-suppress unusedFunction */
+void MagnetometerDrv::getMagnetic(sensors_vec_t& magnetic)
 {
-    Board& board = Board::getInstance();
+    sensors_event_t magneticEvent;
 
-    /* Set serial baudrate */
-    Serial.begin(SERIAL_BAUDRATE);
-
-#if (0 != NEOPIXELLAMP_WAIT_FOR_USB)
-
-    /* Wait for serial port to connect. Needed for native USB */
-    while (!Serial)
+    while (false == m_sensor.getEvent(&magneticEvent))
+    {
         ;
-
-#endif
-
-    Serial.println("Setup NeoPixelLamp ...");
-
-    if (false == board.init())
-    {
-        Serial.println("Failed to initialize the hardware.");
-        delay(100U); /* Ensure that the previous printed info is transferred over serial connection. */
-
-        Board::reset();
-    }
-    else
-    {
-        Serial.println("NeoPixelLamp is ready.");
     }
 
-    Timer::init(getTimestamp);
+    magnetic = magneticEvent.magnetic;
+
+    if (true == m_isOffsetCompensationEnabled)
+    {
+        magnetic.x += m_offset.x;
+        magnetic.y += m_offset.y;
+        magnetic.z += m_offset.z;
+    }
 }
 
-/**
- * Main program loop.
- * This function is called cyclic.
- */
-void loop() /* cppcheck-suppress unusedFunction */
+float MagnetometerDrv::getHeading()
 {
-    gScheduler.execute();
+    sensors_vec_t magnetic;
+    float         heading = 0.0F;
+
+    getMagnetic(magnetic);
+
+    if (0.0f < magnetic.y)
+    {
+        heading = 90.0F - (atan(magnetic.x / magnetic.y) * (180.0F / PI));
+    }
+    else if (0.0f > magnetic.y)
+    {
+        heading = -1.0F * (atan(magnetic.x / magnetic.y) * (180.0F / PI));
+    }
+    else /* magnetic.y = 0.0f */
+    {
+        if (0.0f > magnetic.x)
+        {
+            heading = 180.0F;
+        }
+        else
+        {
+            heading = 0.0F;
+        }
+    }
+
+    return heading;
 }
 
 /******************************************************************************
- * Local functions
+ * Protected Methods
  *****************************************************************************/
 
-/**
- * Get current timestamp in ms.
- *
- * @return Timestamp in ms
- */
-static uint32_t getTimestamp()
-{
-    return static_cast<uint32_t>(millis());
-}
+/******************************************************************************
+ * Private Methods
+ *****************************************************************************/
+
+/******************************************************************************
+ * External Functions
+ *****************************************************************************/
+
+/******************************************************************************
+ * Local Functions
+ *****************************************************************************/

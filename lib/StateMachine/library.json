@@ -1,0 +1,14 @@
+{
+    "name": "StateMachine",
+    "version": "0.1.0",
+    "description": "Simple state machine with state interface.",
+    "authors": [{
+        "name": "Andreas Merkle",
+        "email": "web@blue-andi.de",
+        "url": "https://github.com/BlueAndi",
+        "maintainer": true
+    }],
+    "license": "MIT",
+    "frameworks": "*",
+    "platforms": "*"
+}

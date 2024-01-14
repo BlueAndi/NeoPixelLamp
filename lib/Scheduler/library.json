@@ -1,0 +1,14 @@
+{
+    "name": "Scheduler",
+    "version": "0.1.0",
+    "description": "Simple cooperative task scheduler.",
+    "authors": [{
+        "name": "Andreas Merkle",
+        "email": "web@blue-andi.de",
+        "url": "https://github.com/BlueAndi",
+        "maintainer": true
+    }],
+    "license": "MIT",
+    "frameworks": "*",
+    "platforms": "*"
+}

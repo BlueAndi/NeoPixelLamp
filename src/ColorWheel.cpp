@@ -25,124 +25,91 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Main entry point
+ * @brief  Color wheel
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include <Arduino.h>
-#include <Board.h>
-#include <Scheduler.h>
-#include <Task.h>
-#include <TTask.h>
+#include "ColorWheel.h"
+#include <Adafruit_NeoPixel.h>
 
-#include "TaskModeHandler.h"
-#include "TaskUI.h"
-#include "TaskSleep.h"
+/******************************************************************************
+ * Compiler Switches
+ *****************************************************************************/
 
 /******************************************************************************
  * Macros
  *****************************************************************************/
 
-/** 
- * For debug purposes it is better to wait for an established USB connection (1)
- * otherwise nothing will be seen in the serial console.
- * In normal mode (no debugging) without a USB connection, it must be disabled,
- * otherwise the program will hang in a infinite loop.
- */
-#define NEOPIXELLAMP_WAIT_FOR_USB 0
-
-/** Get number of elements in the given array. */
-#define ARRAY_NUM(__arr) (sizeof(__arr) / sizeof((__arr)[0]))
-
 /******************************************************************************
- * Types and Classes
+ * Types and classes
  *****************************************************************************/
 
 /******************************************************************************
  * Prototypes
  *****************************************************************************/
 
-static uint32_t getTimestamp();
-
 /******************************************************************************
- * Variables
+ * Local Variables
  *****************************************************************************/
 
-/** The list of tasks which are scheduled by the scheduler. */
-static TaskBase* gTaskList[] = {
-    TaskModeHandler::getTask(), /* Handles the selected mode. */
-    TaskUI::getTask(),          /* Handles the user interface. */
-    TaskSleep::getTask()        /* Handles the sleep mode. */
-};
-
-/** Serial baudrate. */
-static const unsigned long SERIAL_BAUDRATE = 9600U;
-
-/** The task scheduler. */
-static Scheduler gScheduler(gTaskList, ARRAY_NUM(gTaskList));
-
 /******************************************************************************
- * External functions
+ * Public Methods
  *****************************************************************************/
 
-/**
- * Initialize the system.
- * This function is called once during startup.
- */
-void setup() /* cppcheck-suppress unusedFunction */
+/******************************************************************************
+ * Protected Methods
+ *****************************************************************************/
+
+/******************************************************************************
+ * Private Methods
+ *****************************************************************************/
+
+/******************************************************************************
+ * External Functions
+ *****************************************************************************/
+
+uint32_t ColorWheel::turn(uint8_t wheelPos)
 {
-    Board& board = Board::getInstance();
+    const uint8_t COL_PARTS = 3U;
+    const uint8_t COL_RANGE = UINT8_MAX / COL_PARTS;
+    uint8_t       red;
+    uint8_t       green;
+    uint8_t       blue;
 
-    /* Set serial baudrate */
-    Serial.begin(SERIAL_BAUDRATE);
+    wheelPos = UINT8_MAX - wheelPos;
 
-#if (0 != NEOPIXELLAMP_WAIT_FOR_USB)
-
-    /* Wait for serial port to connect. Needed for native USB */
-    while (!Serial)
-        ;
-
-#endif
-
-    Serial.println("Setup NeoPixelLamp ...");
-
-    if (false == board.init())
+    /* Red + Blue ? */
+    if (wheelPos < COL_RANGE)
     {
-        Serial.println("Failed to initialize the hardware.");
-        delay(100U); /* Ensure that the previous printed info is transferred over serial connection. */
-
-        Board::reset();
+        red   = UINT8_MAX - wheelPos * COL_PARTS;
+        green = 0U;
+        blue  = COL_PARTS * wheelPos;
     }
+    /* Green + Blue ? */
+    else if (wheelPos < (2 * COL_RANGE))
+    {
+        wheelPos -= COL_RANGE;
+
+        red   = 0U;
+        green = COL_PARTS * wheelPos;
+        blue  = UINT8_MAX - wheelPos * COL_PARTS;
+    }
+    /* Red + Green */
     else
     {
-        Serial.println("NeoPixelLamp is ready.");
+        wheelPos -= ((COL_PARTS - 1U) * COL_RANGE);
+
+        red   = COL_PARTS * wheelPos;
+        green = UINT8_MAX - wheelPos * COL_PARTS;
+        blue  = 0U;
     }
 
-    Timer::init(getTimestamp);
-}
-
-/**
- * Main program loop.
- * This function is called cyclic.
- */
-void loop() /* cppcheck-suppress unusedFunction */
-{
-    gScheduler.execute();
+    return Adafruit_NeoPixel::Color(red, green, blue);
 }
 
 /******************************************************************************
- * Local functions
+ * Local Functions
  *****************************************************************************/
-
-/**
- * Get current timestamp in ms.
- *
- * @return Timestamp in ms
- */
-static uint32_t getTimestamp()
-{
-    return static_cast<uint32_t>(millis());
-}

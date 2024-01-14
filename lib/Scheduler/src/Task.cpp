@@ -25,124 +25,51 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Main entry point
+ * @brief  Cooperative task
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include <Arduino.h>
-#include <Board.h>
-#include <Scheduler.h>
-#include <Task.h>
-#include <TTask.h>
+#include "Task.h"
 
-#include "TaskModeHandler.h"
-#include "TaskUI.h"
-#include "TaskSleep.h"
+/******************************************************************************
+ * Compiler Switches
+ *****************************************************************************/
 
 /******************************************************************************
  * Macros
  *****************************************************************************/
 
-/** 
- * For debug purposes it is better to wait for an established USB connection (1)
- * otherwise nothing will be seen in the serial console.
- * In normal mode (no debugging) without a USB connection, it must be disabled,
- * otherwise the program will hang in a infinite loop.
- */
-#define NEOPIXELLAMP_WAIT_FOR_USB 0
-
-/** Get number of elements in the given array. */
-#define ARRAY_NUM(__arr) (sizeof(__arr) / sizeof((__arr)[0]))
-
 /******************************************************************************
- * Types and Classes
+ * Types and classes
  *****************************************************************************/
 
 /******************************************************************************
  * Prototypes
  *****************************************************************************/
 
-static uint32_t getTimestamp();
-
 /******************************************************************************
- * Variables
+ * Local Variables
  *****************************************************************************/
 
-/** The list of tasks which are scheduled by the scheduler. */
-static TaskBase* gTaskList[] = {
-    TaskModeHandler::getTask(), /* Handles the selected mode. */
-    TaskUI::getTask(),          /* Handles the user interface. */
-    TaskSleep::getTask()        /* Handles the sleep mode. */
-};
-
-/** Serial baudrate. */
-static const unsigned long SERIAL_BAUDRATE = 9600U;
-
-/** The task scheduler. */
-static Scheduler gScheduler(gTaskList, ARRAY_NUM(gTaskList));
-
 /******************************************************************************
- * External functions
+ * Public Methods
  *****************************************************************************/
 
-/**
- * Initialize the system.
- * This function is called once during startup.
- */
-void setup() /* cppcheck-suppress unusedFunction */
-{
-    Board& board = Board::getInstance();
-
-    /* Set serial baudrate */
-    Serial.begin(SERIAL_BAUDRATE);
-
-#if (0 != NEOPIXELLAMP_WAIT_FOR_USB)
-
-    /* Wait for serial port to connect. Needed for native USB */
-    while (!Serial)
-        ;
-
-#endif
-
-    Serial.println("Setup NeoPixelLamp ...");
-
-    if (false == board.init())
-    {
-        Serial.println("Failed to initialize the hardware.");
-        delay(100U); /* Ensure that the previous printed info is transferred over serial connection. */
-
-        Board::reset();
-    }
-    else
-    {
-        Serial.println("NeoPixelLamp is ready.");
-    }
-
-    Timer::init(getTimestamp);
-}
-
-/**
- * Main program loop.
- * This function is called cyclic.
- */
-void loop() /* cppcheck-suppress unusedFunction */
-{
-    gScheduler.execute();
-}
-
 /******************************************************************************
- * Local functions
+ * Protected Methods
  *****************************************************************************/
 
-/**
- * Get current timestamp in ms.
- *
- * @return Timestamp in ms
- */
-static uint32_t getTimestamp()
-{
-    return static_cast<uint32_t>(millis());
-}
+/******************************************************************************
+ * Private Methods
+ *****************************************************************************/
+
+/******************************************************************************
+ * External Functions
+ *****************************************************************************/
+
+/******************************************************************************
+ * Local Functions
+ *****************************************************************************/

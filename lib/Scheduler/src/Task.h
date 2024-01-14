@@ -1,0 +1,106 @@
+/* MIT License
+ *
+ * Copyright (c) 2016 - 2024 Andreas Merkle <web@blue-andi.de>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/*******************************************************************************
+    DESCRIPTION
+*******************************************************************************/
+/**
+ * @brief  Cooperative task
+ * @author Andreas Merkle <web@blue-andi.de>
+ *
+ * @addtogroup OS
+ *
+ * @{
+ */
+
+#ifndef TASK_H
+#define TASK_H
+
+/******************************************************************************
+ * Compile Switches
+ *****************************************************************************/
+
+/******************************************************************************
+ * Includes
+ *****************************************************************************/
+#include "TaskBase.h"
+
+/******************************************************************************
+ * Macros
+ *****************************************************************************/
+
+/******************************************************************************
+ * Types and Classes
+ *****************************************************************************/
+
+/**
+ * Simple task which process the user defined function.
+ * Its not necessary to derived from it! If a class method shall be called
+ * by the task, derive your class from the TaskBase.
+ */
+class Task : public TaskBase
+{
+public:
+    /**
+     * Construct the instance.
+     *
+     * @param[in] taskFunc      Task function, which shall be called by the scheduler.
+     * @param[in] taskFuncPar   Task function parameter.
+     * @param[in] suspended     Shall the task be suspended or running at the begin? Default: suspended
+     */
+    Task(TaskFunc taskFunc, void* taskFuncPar, bool suspended = true) :
+        TaskBase(suspended),
+        m_taskFunc(taskFunc),
+        m_taskFuncPar(taskFuncPar)
+    {
+    }
+
+    /**
+     * Destroy the instance.
+     */
+    virtual ~Task()
+    {
+    }
+
+private:
+    TaskFunc m_taskFunc;    /**< User specific function which to call. */
+    void*    m_taskFuncPar; /**< User function specific parameter. */
+
+    /**
+     * Process the task function.
+     */
+    void process(void) override
+    {
+        if (nullptr != m_taskFunc)
+        {
+            m_taskFunc(m_taskFuncPar);
+        }
+    }
+};
+
+/******************************************************************************
+ * Functions
+ *****************************************************************************/
+
+#endif /* TASK_H */
+/** @} */
