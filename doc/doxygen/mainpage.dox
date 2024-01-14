@@ -1,0 +1,21 @@
+@mainpage Manual of NeoPixelLamp
+
+@defgroup Application Application
+The main application.
+@{
+@}
+
+@defgroup HAL Hardware abstraction
+Abstracts the the physical hardware.
+@{
+@}
+
+@defgroup Service Service
+The services which are widely used by the application.
+@{
+@}
+
+@defgroup OS OS
+The cooperative operating system.
+@{
+@}
