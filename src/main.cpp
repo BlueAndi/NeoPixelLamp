@@ -41,10 +41,17 @@
 #include "TaskModeHandler.h"
 #include "TaskUI.h"
 #include "TaskSleep.h"
+#include "TaskDebugPlot.h"
 
 /******************************************************************************
  * Macros
  *****************************************************************************/
+
+/**
+ * Enables only the debug plot task. It will provide values over the serial
+ * interface to track them over the serial plotter.
+ */
+#define ENABLE_DEBUG_PLOT 0
 
 /**
  * For debug purposes it is better to wait for an established USB connection (1)
@@ -72,12 +79,21 @@ static void     loadCalibration();
  * Variables
  *****************************************************************************/
 
+#if (0 == ENABLE_DEBUG_PLOT)
+
 /** The list of tasks which are scheduled by the scheduler. */
 static TaskBase* gTaskList[] = {
     TaskModeHandler::getTask(), /* Handles the selected mode. */
     TaskUI::getTask(),          /* Handles the user interface. */
     TaskSleep::getTask()        /* Handles the sleep mode. */
 };
+
+#else /* (0 == ENABLE_DEBUG_PLOT) */
+
+/** The list of tasks which are scheduled by the scheduler. */
+static TaskBase* gTaskList[] = {TaskDebugPlot::getTask()};
+
+#endif /* (0 == ENABLE_DEBUG_PLOT) */
 
 /** Serial baudrate. */
 static const unsigned long SERIAL_BAUDRATE = 9600U;
