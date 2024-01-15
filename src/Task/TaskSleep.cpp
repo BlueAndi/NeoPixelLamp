@@ -36,6 +36,7 @@
 #include <Task.h>
 #include <Board.h>
 #include <Constants.h>
+#include "TaskModeHandler.h"
 
 #include <avr/sleep.h>
 #include <avr/wdt.h>
@@ -57,6 +58,7 @@
  *****************************************************************************/
 
 static void taskFunc(void* par);
+static void fadeOut();
 
 /******************************************************************************
  * Local Variables
@@ -64,6 +66,13 @@ static void taskFunc(void* par);
 
 /** Task which handles the system sleep to reduce power consumption. */
 static Task gTask(taskFunc, nullptr, false);
+
+/**
+ * Flag to indicate whether sleep mode is active or not.
+ * Use it during the watchdog wake up's to know whether sleep mode is already
+ * active or not.
+ */
+static bool gSleepModeActive = false;
 
 /******************************************************************************
  * Public Methods
@@ -97,7 +106,8 @@ TaskBase* TaskSleep::getTask()
  */
 static void taskFunc(void* par)
 {
-    AccelerationDrv& accDrv = Board::getInstance().getAccelerationSensor();
+    Board&           board  = Board::getInstance();
+    AccelerationDrv& accDrv = board.getAccelerationSensor();
     sensors_vec_t    acceleration;
     const float      WAKE_UP_ACC_Z_THRESHOLD = Constants::earthGravity - 2.0F; /* [m/s^2] */
 
@@ -106,6 +116,16 @@ static void taskFunc(void* par)
     /* If the lamp is on its head, the user requests sleep mode. */
     if (WAKE_UP_ACC_Z_THRESHOLD >= acceleration.z)
     {
+        if (false == gSleepModeActive)
+        {
+            /* Stop animations. */
+            TaskModeHandler::getTask()->suspend();
+            fadeOut();
+
+            /* Ensure the onboard LED is off to save power. */
+            board.ledOff();
+        }
+
 #if 0
         // Power down the LSM9DS0 sensor
         uint8_t regCtrlReg1G = lsm.read8(GYROTYPE, Adafruit_LSM9DS0::LSM9DS0_REGISTER_CTRL_REG1_G);
@@ -159,6 +179,51 @@ static void taskFunc(void* par)
         lsm.write8(GYROTYPE, Adafruit_LSM9DS0::LSM9DS0_REGISTER_CTRL_REG1_G, regCtrlReg1G);
 #endif
     }
+    else
+    {
+        if (true == gSleepModeActive)
+        {
+            /* Play animations again. */
+            TaskModeHandler::getTask()->resume();
+
+            /* Mode must be restarted! */
+            TaskModeHandler::restartMode();
+        }
+    }
+}
+
+/**
+ * Fade pixels out.
+ */
+static void fadeOut()
+{
+    Board&             board         = Board::getInstance();
+    Adafruit_NeoPixel& neoPixel      = board.getPixelDrv();
+    uint8_t            oldBrightness = neoPixel.getBrightness();
+    const uint32_t     RED           = Adafruit_NeoPixel::Color(255U, 0U, 0U);
+    uint8_t            run;
+    uint8_t            brightness;
+
+    for (run = 0U; run < neoPixel.numPixels(); ++run)
+    {
+        neoPixel.setPixelColor(run, RED);
+    }
+
+    neoPixel.show();
+
+    for (brightness = Constants::neoPixelMaxBrightness; brightness > 0U; --brightness)
+    {
+        neoPixel.setBrightness(brightness);
+        neoPixel.show();
+
+        delay(10U);
+    }
+
+    neoPixel.clear();
+    neoPixel.show();
+
+    /* Restore original user choosen brightness. */
+    neoPixel.setBrightness(oldBrightness);
 }
 
 /**

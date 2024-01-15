@@ -74,6 +74,11 @@ namespace TaskModeHandler
      */
     void selectNextMode();
 
+    /**
+     * Restart current mode.
+     */
+    void restartMode();
+
 }; /* namespace TaskModeHandler */
 
 #endif /* TASK_MODE_HANDLER_H */

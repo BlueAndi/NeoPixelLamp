@@ -136,6 +136,16 @@ void TaskModeHandler::selectNextMode()
     redSplash(gIndexOfCurrentMode);
 }
 
+void TaskModeHandler::restartMode()
+{
+    IState* currentState = gStateMachine.getState();
+
+    if (nullptr != currentState)
+    {
+        currentState->entry();
+    }
+}
+
 /******************************************************************************
  * Local Functions
  *****************************************************************************/
