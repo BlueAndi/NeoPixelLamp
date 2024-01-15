@@ -50,6 +50,7 @@
 #include "GyroscopeDrv.h"
 #include "MagnetometerDrv.h"
 #include "TemperatureDrv.h"
+#include "Settings.h"
 
 /******************************************************************************
  * Macros
@@ -155,6 +156,16 @@ public:
         return m_neoPixel;
     }
 
+    /**
+     * Get settings to retrieve persistent stored values.
+     *
+     * @return Settings
+     */
+    Settings& getSettings()
+    {
+        return m_settings;
+    }
+
 private:
     Adafruit_LSM9DS0  m_magneticSensorDrv; /**< LSM9DS0 magnetic sensor driver, I2C address 0xD4. */
     Adafruit_NeoPixel m_neoPixel;          /**< NeoPixel strip driver. */
@@ -162,6 +173,7 @@ private:
     GyroscopeDrv      m_gyroDrv;           /**< Gyroscope driver which uses the LSM9DS0. */
     MagnetometerDrv   m_magDrv;            /**< Magnetometer driver which uses the LSM9DS0. */
     TemperatureDrv    m_tmpDrv;            /**< Temperature driver which uses the LSM9DS0. */
+    Settings          m_settings;          /**< Settings with persistent stored values. */
 
     /**
      * Constructs the concrete board.

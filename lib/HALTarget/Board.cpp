@@ -85,6 +85,9 @@ bool Board::init()
     /* Enable the onboard LED till setup. */
     ledOn();
 
+    /* Initialize settings */
+    m_settings.init();
+
     /* Disable some peripherals to reduce power consumption */
     power_adc_disable();
     power_spi_disable();
@@ -109,14 +112,6 @@ bool Board::init()
     }
     else
     {
-        /* Set accelerometer anti-alias filter bandwidth to 50 Hz */
-#if 0
-        uint8_t reg = lsm.read8(XMTYPE, Adafruit_LSM9DS0::LSM9DS0_REGISTER_CTRL_REG2_XM);
-        reg &= 0x3f;
-        reg |= 0xc0;
-        lsm.write8(XMTYPE, Adafruit_LSM9DS0::LSM9DS0_REGISTER_CTRL_REG2_XM, reg);
-#endif
-
         /* 1.) Set the accelerometer range. */
         m_magneticSensorDrv.setupAccel(Adafruit_LSM9DS0::LSM9DS0_ACCELRANGE_2G);
 

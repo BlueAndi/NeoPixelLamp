@@ -46,7 +46,7 @@
  * Macros
  *****************************************************************************/
 
-/** 
+/**
  * For debug purposes it is better to wait for an established USB connection (1)
  * otherwise nothing will be seen in the serial console.
  * In normal mode (no debugging) without a USB connection, it must be disabled,
@@ -66,6 +66,7 @@
  *****************************************************************************/
 
 static uint32_t getTimestamp();
+static void     loadCalibration();
 
 /******************************************************************************
  * Variables
@@ -118,6 +119,8 @@ void setup() /* cppcheck-suppress unusedFunction */
     }
     else
     {
+        loadCalibration();
+
         Serial.println("NeoPixelLamp is ready.");
     }
 
@@ -145,4 +148,22 @@ void loop() /* cppcheck-suppress unusedFunction */
 static uint32_t getTimestamp()
 {
     return static_cast<uint32_t>(millis());
+}
+
+/**
+ * Load the calibration values for the magnetometer.
+ */
+static void loadCalibration()
+{
+    Board&           board    = Board::getInstance();
+    AccelerationDrv& accDrv   = board.getAccelerationSensor();
+    Settings&        settings = board.getSettings();
+    sensors_vec_t    offset;
+
+    offset.x = settings.getAccelerationXOffset();
+    offset.y = settings.getAccelerationYOffset();
+    offset.z = settings.getAccelerationZOffset();
+
+    accDrv.setOffset(offset);
+    accDrv.enableOffsetCompensation();
 }
