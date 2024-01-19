@@ -51,71 +51,61 @@
  * Prototypes
  *****************************************************************************/
 
-template<typename T>
-static T readData(const void* addr);
-template<typename T>
-static void writeData(const void* addr, T data);
-
 /******************************************************************************
  * Local Variables
  *****************************************************************************/
 
 /**
- * Magic pattern address in EEPROM.
+ * The magic pattern which is used to determine whether the EEPROM
+ * is initialized or not.
  */
-static const void* MAGIC_PATTERN_ADDR = static_cast<const void*>(0x0000);
+static const uint32_t MAGIC_PATTERN = 0xC0FFEE;
 
 /**
- * Magic pattern size in byte.
+ * Data version is used to detect whether the data in the EEPROM is
+ * compatible with the current settings version.
+ *
+ * Increase the version number by 1 for every change!
  */
-static const size_t MAGIC_PATTERN_SIZE = sizeof(uint32_t);
-
-/**
- * Data version address in EEPROM.
- */
-static const void* DATA_VERSION_ADDR = &static_cast<const uint8_t*>(MAGIC_PATTERN_ADDR)[MAGIC_PATTERN_SIZE];
-
-/**
- * Data version size in byte.
- */
-static const size_t DATA_VERSION_SIZE = sizeof(uint8_t);
-
-/**
- * x-axis acceleration offset address.
- */
-static const void* ACC_X_OFFSET_ADDR = &static_cast<const uint8_t*>(DATA_VERSION_ADDR)[DATA_VERSION_SIZE];
-
-/**
- * x-axis acceleration offset size in byte.
- */
-static const size_t ACC_X_OFFSET_SIZE = sizeof(float);
-
-/**
- * y-axis acceleration offset address.
- */
-static const void* ACC_Y_OFFSET_ADDR = &static_cast<const uint8_t*>(ACC_X_OFFSET_ADDR)[ACC_X_OFFSET_SIZE];
-
-/**
- * y-axis acceleration offset size in byte.
- */
-static const size_t ACC_Y_OFFSET_SIZE = sizeof(float);
-
-/**
- * z-axis acceleration offset address.
- */
-static const void* ACC_Z_OFFSET_ADDR = &static_cast<const uint8_t*>(ACC_Y_OFFSET_ADDR)[ACC_Y_OFFSET_SIZE];
-
-/**
- * z-axis acceleration offset size in byte.
- */
-static const size_t ACC_Z_OFFSET_SIZE = sizeof(float);
-
-/* ---------- */
+static const uint8_t DATA_VERSION = 1U;
 
 /**
  * Default acceleration offset in m/s^2, used for initialization.
  */
 static const float DEFAULT_ACCELERATION_OFFSET = 0.0F;
+
+/* ---------- Attention! ----------
+ * Keep the following order of variables in the EEPROM.
+ * Add new values at the tail.
+ * Increase the data version (DATA_VERSION) for every change!
+ */
+
+/**
+ * Magic pattern in EEPROM.
+ */
+static uint32_t EEMEM gMagicPattern = MAGIC_PATTERN;
+
+/**
+ * Data version in EEPROM.
+ */
+static uint8_t EEMEM gDataVersion = DATA_VERSION;
+
+/**
+ * x-axis acceleration offset in EEPROM.
+ */
+static float EEMEM gAccXOffset = DEFAULT_ACCELERATION_OFFSET;
+
+/**
+ * y-axis acceleration offset in EEPROM.
+ */
+static float EEMEM gAccYOffset = DEFAULT_ACCELERATION_OFFSET;
+
+/**
+ * z-axis acceleration offset in EEPROM.
+ */
+static float EEMEM gAccZOffset = DEFAULT_ACCELERATION_OFFSET;
+
+/* ---------- Tail of EEPROM data. ---------- */
 
 /******************************************************************************
  * Public Methods
@@ -123,8 +113,8 @@ static const float DEFAULT_ACCELERATION_OFFSET = 0.0F;
 
 void Settings::init()
 {
-    uint32_t magicPattern = readData<uint32_t>(MAGIC_PATTERN_ADDR);
-    uint8_t  dataVersion  = readData<uint8_t>(DATA_VERSION_ADDR);
+    uint32_t magicPattern = getMagicPattern();
+    uint8_t  dataVersion  = getDataVersion();
 
     if ((MAGIC_PATTERN != magicPattern) || (DATA_VERSION != dataVersion))
     {
@@ -134,39 +124,39 @@ void Settings::init()
         setAccelerationZOffset(DEFAULT_ACCELERATION_OFFSET);
 
         /* Mark data in EEPROM as valid. */
-        writeData<uint32_t>(MAGIC_PATTERN_ADDR, MAGIC_PATTERN);
-        writeData<uint8_t>(DATA_VERSION_ADDR, DATA_VERSION_SIZE);
+        setMagicPattern(MAGIC_PATTERN);
+        setDataVersion(DATA_VERSION);
     }
 }
 
 float Settings::getAccelerationXOffset() const
 {
-    return readData<float>(ACC_X_OFFSET_ADDR);
+    return eeprom_read_float(&gAccXOffset);
 }
 
 void Settings::setAccelerationXOffset(float offset) const
 {
-    writeData<float>(ACC_X_OFFSET_ADDR, offset);
+    eeprom_update_float(&gAccXOffset, offset);
 }
 
 float Settings::getAccelerationYOffset() const
 {
-    return readData<float>(ACC_Y_OFFSET_ADDR);
+    return eeprom_read_float(&gAccYOffset);
 }
 
 void Settings::setAccelerationYOffset(float offset) const
 {
-    writeData<float>(ACC_Y_OFFSET_ADDR, offset);
+    eeprom_update_float(&gAccYOffset, offset);
 }
 
 float Settings::getAccelerationZOffset() const
 {
-    return readData<float>(ACC_X_OFFSET_ADDR);
+    return eeprom_read_float(&gAccZOffset);
 }
 
 void Settings::setAccelerationZOffset(float offset) const
 {
-    writeData<float>(ACC_Z_OFFSET_ADDR, offset);
+    eeprom_update_float(&gAccZOffset, offset);
 }
 
 /******************************************************************************
@@ -177,6 +167,26 @@ void Settings::setAccelerationZOffset(float offset) const
  * Private Methods
  *****************************************************************************/
 
+uint32_t Settings::getMagicPattern() const
+{
+    return eeprom_read_dword(&gMagicPattern);
+}
+
+void Settings::setMagicPattern(uint32_t value) const
+{
+    eeprom_update_dword(&gMagicPattern, value);
+}
+
+uint8_t Settings::getDataVersion() const
+{
+    return eeprom_read_byte(&gDataVersion);
+}
+
+void Settings::setDataVersion(uint8_t value) const
+{
+    eeprom_update_byte(&gDataVersion, value);
+}
+
 /******************************************************************************
  * External Functions
  *****************************************************************************/
@@ -184,36 +194,3 @@ void Settings::setAccelerationZOffset(float offset) const
 /******************************************************************************
  * Local Functions
  *****************************************************************************/
-
-/**
- * Read data from EEPROM.
- *
- * @tparam T    Data type
- *
- * @param[in]   addr    Address in the EEPROM.
- *
- * @return Data
- */
-template<typename T>
-static T readData(const void* addr)
-{
-    T value;
-
-    eeprom_read_block(&value, addr, sizeof(T));
-
-    return value;
-}
-
-/**
- * Read data from EEPROM.
- *
- * @tparam T    Data type
- *
- * @param[in]   addr    Address in the EEPROM.
- * @param[in]   data    Data to write.
- */
-template<typename T>
-static void writeData(const void* addr, T data)
-{
-    eeprom_write_block(addr, &data, sizeof(T));
-}
