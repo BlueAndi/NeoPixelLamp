@@ -117,6 +117,7 @@ public:
 
     /**
      * Get absolute acceleration in m/s^2.
+     * 
      * If the acceleration vector is given as parameter, it will return its
      * absolute value. Otherwise it will automatically retrieve the current
      * acceleration vector and return its absolute value.
@@ -128,7 +129,7 @@ public:
      *
      * @return Absolute acceleration value in m/s^2.
      */
-    float getAbsAcceleration(sensors_vec_t* acceleration = nullptr);
+    float getAbsAcceleration(const sensors_vec_t* acceleration = nullptr);
 
 private:
     Adafruit_Sensor& m_sensor;                      /**< Acceleration sensor */

@@ -59,7 +59,7 @@ static void taskFunc(void* par);
  *****************************************************************************/
 
 /** Task to show debug information on the serial console. */
-static TTask gTask(taskFunc, nullptr, 100U, true);
+static TTask gTask(taskFunc, nullptr, 20U, true);
 
 /******************************************************************************
  * Public Methods
@@ -99,23 +99,55 @@ static void taskFunc(void* par)
     sensors_vec_t    acceleration;
     sensors_vec_t    gyro;
     float            absAcceleration = 0.0F;
+    unsigned long    timestamp       = millis();
+
+    board.process();
 
     accDrv.getAcceleration(acceleration);
     gyroDrv.getGyro(gyro);
 
     absAcceleration = accDrv.getAbsAcceleration(&acceleration);
 
+    /* Using teleplot to visualization: https://github.com/nesnes/teleplot */
+    Serial.print(">accX:");
+    Serial.print(timestamp);
+    Serial.print(":");
     Serial.print(acceleration.x, 2);
-    Serial.print(",");
-    Serial.print(acceleration.y, 2);
-    Serial.print(",");
-    Serial.println(acceleration.z, 2);
-    Serial.print(",");
-    Serial.println(absAcceleration, 2);
+    Serial.println(":m/s^2");
 
+    Serial.print(">accY:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(acceleration.y, 2);
+    Serial.println(":m/s^2y");
+
+    Serial.print(">accZ:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(acceleration.z, 2);
+    Serial.println(":m/s^2");
+
+    Serial.print(">accAbs:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(absAcceleration, 2);
+    Serial.println(":m/s^2");
+
+    Serial.print(">gyroX:");
+    Serial.print(timestamp);
+    Serial.print(":");
     Serial.print(gyro.x, 2);
-    Serial.print(",");
+    Serial.println(":°/s");
+
+    Serial.print(">gyroY:");
+    Serial.print(timestamp);
+    Serial.print(":");
     Serial.print(gyro.y, 2);
-    Serial.print(",");
-    Serial.println(gyro.z, 2);
+    Serial.println(":°/s");
+
+    Serial.print(">gyroZ:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(gyro.z, 2);
+    Serial.println(":°/s");
 }

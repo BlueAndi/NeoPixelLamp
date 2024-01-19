@@ -38,6 +38,7 @@
 #include <Board.h>
 #include <Constants.h>
 
+#include "TaskMotion.h"
 #include "ModeRainbow.h"
 #include "ModeTheatre.h"
 #include "ModeTemperature.h"
@@ -64,8 +65,9 @@
  */
 typedef struct
 {
-    IState*  state;  /**< State which handles the mode. */
-    uint32_t period; /**< Call period of the state. */
+    const char* name;   /**< Name of the mode. */
+    IState*     state;  /**< State which handles the mode. */
+    uint32_t    period; /**< Call period of the state. */
 
 } Mode;
 
@@ -74,6 +76,7 @@ typedef struct
  *****************************************************************************/
 
 static void modeHandler(void* par);
+void        selectNextMode();
 static void redSplash(uint8_t count);
 
 /******************************************************************************
@@ -86,12 +89,27 @@ static TTask gTask(modeHandler, nullptr, 20U, false);
 /** Each mode is handled by a separate state. */
 static StateMachine gStateMachine;
 
+/** Mode name: Rainbow */
+static const char PROGMEM gModeNameRainbow[] = "Rainbow";
+
+/** Mode name: Theatre */
+static const char PROGMEM gModeNameTheatre[] = "Theatre";
+
+/** Mode name: Temperature */
+static const char PROGMEM gModeNameTemperature[] = "Temperature";
+
+/** Mode name: Color */
+static const char PROGMEM gModeNameColor[] = "Color";
+
+/** Mode name: KnightRider */
+static const char PROGMEM gModeNameKnightRider[] = "KnightRider";
+
 /** List of modes. The order is used in case the user selects the next mode. */
-static Mode gModeList[] = {{ModeRainbow::getState(), 20U},
-                           {ModeTheatre::getState(), 100U},
-                           {ModeTemperature::getState(), 100U},
-                           {ModeColor::getState(), 20U},
-                           {ModeKnightRider::getState(), 20U}};
+static Mode gModeList[] = {{gModeNameRainbow, ModeRainbow::getState(), 20U},
+                           {gModeNameTheatre, ModeTheatre::getState(), 100U},
+                           {gModeNameTemperature, ModeTemperature::getState(), 100U},
+                           {gModeNameColor, ModeColor::getState(), 20U},
+                           {gModeNameKnightRider, ModeKnightRider::getState(), 20U}};
 
 /** Index of the current mode in the mode list. */
 static size_t gIndexOfCurrentMode = 0U;
@@ -115,25 +133,6 @@ static size_t gIndexOfCurrentMode = 0U;
 TaskBase* TaskModeHandler::getTask()
 {
     return &gTask;
-}
-
-void TaskModeHandler::selectNextMode()
-{
-    /* Select next mode. */
-    ++gIndexOfCurrentMode;
-
-    /* Handle wrap around. */
-    if (ARRAY_NUM(gModeList) <= gIndexOfCurrentMode)
-    {
-        gIndexOfCurrentMode = 0U;
-    }
-
-    /* Choose the state which handles the new mode. */
-    gStateMachine.setState(gModeList[gIndexOfCurrentMode].state);
-    gTask.setPeriod(gModeList[gIndexOfCurrentMode].period);
-
-    /* Notify user about mode change. */
-    redSplash(gIndexOfCurrentMode);
 }
 
 void TaskModeHandler::restartMode()
@@ -165,8 +164,38 @@ static void modeHandler(void* par)
         gStateMachine.setState(gModeList[gIndexOfCurrentMode].state);
     }
 
+    if (true == TaskMotion::isShakeDetected())
+    {
+        selectNextMode();
+    }
+
     /** Execute the current mode. */
     gStateMachine.process();
+}
+
+/**
+ * Select the next mode.
+ */
+void selectNextMode()
+{
+    /* Select next mode. */
+    ++gIndexOfCurrentMode;
+
+    /* Handle wrap around. */
+    if (ARRAY_NUM(gModeList) <= gIndexOfCurrentMode)
+    {
+        gIndexOfCurrentMode = 0U;
+    }
+
+    Serial.print(F("Change to mode "));
+    Serial.println(reinterpret_cast<const __FlashStringHelper*>(gModeList[gIndexOfCurrentMode].name));
+
+    /* Choose the state which handles the new mode. */
+    gStateMachine.setState(gModeList[gIndexOfCurrentMode].state);
+    gTask.setPeriod(gModeList[gIndexOfCurrentMode].period);
+
+    /* Notify user about mode change. */
+    redSplash(gIndexOfCurrentMode);
 }
 
 /**
@@ -183,7 +212,7 @@ static void redSplash(uint8_t count)
 
     neoPixel.clear();
     neoPixel.show();
-    delay(200U);
+    delay(200U); /* Not nice, but simple. */
 
     neoPixel.setBrightness(Constants::neoPixelMaxBrightness / 2U);
 
@@ -197,11 +226,11 @@ static void redSplash(uint8_t count)
             neoPixel.show();
         }
 
-        delay(500U);
+        delay(500U); /* Not nice, but simple. */
 
         neoPixel.clear();
         neoPixel.show();
-        delay(500U);
+        delay(500U); /* Not nice, but simple. */
 
         ++counted;
     }

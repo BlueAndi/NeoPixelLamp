@@ -37,6 +37,8 @@
 #include <Board.h>
 #include <Constants.h>
 #include "TaskModeHandler.h"
+#include "TaskBrightness.h"
+#include "TaskMotion.h"
 
 #include <avr/sleep.h>
 #include <avr/wdt.h>
@@ -109,21 +111,29 @@ static void taskFunc(void* par)
     Board&           board  = Board::getInstance();
     AccelerationDrv& accDrv = board.getAccelerationSensor();
     sensors_vec_t    acceleration;
-    const float      WAKE_UP_ACC_Z_THRESHOLD = Constants::earthGravity - 2.0F; /* [m/s^2] */
+    const float      MAX_WAKE_UP_ACC_Z = -Constants::earthGravity + 1.0F; /* [m/s^2] */
+    const float      MIN_WAKE_UP_ACC_Z = -Constants::earthGravity - 1.0F; /* [m/s^2] */
 
     accDrv.getAcceleration(acceleration);
 
     /* If the lamp is on its head, the user requests sleep mode. */
-    if (WAKE_UP_ACC_Z_THRESHOLD >= acceleration.z)
+    if ((MAX_WAKE_UP_ACC_Z >= acceleration.z) && (MIN_WAKE_UP_ACC_Z <= acceleration.z))
     {
         if (false == gSleepModeActive)
         {
+            Serial.println(F("Enter sleep mode."));
+
             /* Stop animations. */
             TaskModeHandler::getTask()->suspend();
+            TaskBrightness::getTask()->suspend();
             fadeOut();
 
             /* Ensure the onboard LED is off to save power. */
-            board.ledOff();
+            Board::getInstance().ledOff();
+
+            USBDevice.detach();
+
+            gSleepModeActive = true;
         }
 
 #if 0
@@ -183,11 +193,18 @@ static void taskFunc(void* par)
     {
         if (true == gSleepModeActive)
         {
+            USBDevice.attach();
+
+            Serial.println(F("Leave sleep mode."));
+
             /* Play animations again. */
             TaskModeHandler::getTask()->resume();
+            TaskBrightness::getTask()->resume();
 
             /* Mode must be restarted! */
             TaskModeHandler::restartMode();
+
+            gSleepModeActive = false;
         }
     }
 }

@@ -38,28 +38,26 @@
 #include <Task.h>
 #include <TTask.h>
 
+#include "TaskMotion.h"
+#include "TaskBrightness.h"
 #include "TaskModeHandler.h"
-#include "TaskUI.h"
 #include "TaskSleep.h"
+
+#if (0 != CONFIG_ENABLE_PLOT)
+
 #include "TaskDebugPlot.h"
+
+#endif /* (0 != CONFIG_ENABLE_PLOT) */
+
+#if (0 != CONFIG_ENABLE_CALIBRATION)
+
+#include "TaskCalibration.h"
+
+#endif /* (0 != CONFIG_ENABLE_CALIBRATION) */
 
 /******************************************************************************
  * Macros
  *****************************************************************************/
-
-/**
- * Enables only the debug plot task. It will provide values over the serial
- * interface to track them over the serial plotter.
- */
-#define ENABLE_DEBUG_PLOT 0
-
-/**
- * For debug purposes it is better to wait for an established USB connection (1)
- * otherwise nothing will be seen in the serial console.
- * In normal mode (no debugging) without a USB connection, it must be disabled,
- * otherwise the program will hang in a infinite loop.
- */
-#define NEOPIXELLAMP_WAIT_FOR_USB 0
 
 /** Get number of elements in the given array. */
 #define ARRAY_NUM(__arr) (sizeof(__arr) / sizeof((__arr)[0]))
@@ -79,24 +77,34 @@ static void     loadCalibration();
  * Variables
  *****************************************************************************/
 
-#if (0 == ENABLE_DEBUG_PLOT)
-
-/** The list of tasks which are scheduled by the scheduler. */
-static TaskBase* gTaskList[] = {
-    TaskModeHandler::getTask(), /* Handles the selected mode. */
-    TaskUI::getTask(),          /* Handles the user interface. */
-    TaskSleep::getTask()        /* Handles the sleep mode. */
-};
-
-#else /* (0 == ENABLE_DEBUG_PLOT) */
+#if (0 != CONFIG_ENABLE_PLOT)
 
 /** The list of tasks which are scheduled by the scheduler. */
 static TaskBase* gTaskList[] = {TaskDebugPlot::getTask()};
 
-#endif /* (0 == ENABLE_DEBUG_PLOT) */
+#endif /* (0 != CONFIG_ENABLE_PLOT) */
+
+#if (0 != CONFIG_ENABLE_CALIBRATION)
+
+/** The list of tasks which are scheduled by the scheduler. */
+static TaskBase* gTaskList[] = {TaskCalibration::getTask()};
+
+#endif /* (0 != CONFIG_ENABLE_CALIBRATION) */
+
+#if (0 == CONFIG_ENABLE_PLOT) && (0 == CONFIG_ENABLE_CALIBRATION)
+
+/** The list of tasks which are scheduled by the scheduler. */
+static TaskBase* gTaskList[] = {
+    TaskMotion::getTask(),      /* Handles the motion detection. */
+    TaskBrightness::getTask(),  /* Handles the lamp brightness. */
+    TaskModeHandler::getTask(), /* Handles the selected mode. */
+    TaskSleep::getTask()        /* Handles the sleep mode. */
+};
+
+#endif /* (0 == CONFIG_ENABLE_PLOT) && (0 == CONFIG_ENABLE_CALIBRATION) */
 
 /** Serial baudrate. */
-static const unsigned long SERIAL_BAUDRATE = 9600U;
+static const unsigned long SERIAL_BAUDRATE = 115200U;
 
 /** The task scheduler. */
 static Scheduler gScheduler(gTaskList, ARRAY_NUM(gTaskList));
@@ -116,7 +124,7 @@ void setup() /* cppcheck-suppress unusedFunction */
     /* Set serial baudrate */
     Serial.begin(SERIAL_BAUDRATE);
 
-#if (0 != NEOPIXELLAMP_WAIT_FOR_USB)
+#if (0 != CONFIG_WAIT_FOR_USB)
 
     /* Wait for serial port to connect. Needed for native USB */
     while (!Serial)
@@ -124,11 +132,11 @@ void setup() /* cppcheck-suppress unusedFunction */
 
 #endif
 
-    Serial.println("Setup NeoPixelLamp ...");
+    Serial.println(F("Setup NeoPixelLamp ..."));
 
     if (false == board.init())
     {
-        Serial.println("Failed to initialize the hardware.");
+        Serial.println(F("Failed to initialize the hardware."));
         delay(100U); /* Ensure that the previous printed info is transferred over serial connection. */
 
         Board::reset();
@@ -137,7 +145,7 @@ void setup() /* cppcheck-suppress unusedFunction */
     {
         loadCalibration();
 
-        Serial.println("NeoPixelLamp is ready.");
+        Serial.println(F("NeoPixelLamp is ready."));
     }
 
     Timer::init(getTimestamp);

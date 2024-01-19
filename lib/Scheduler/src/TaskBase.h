@@ -56,7 +56,7 @@
 
 /**
  * This base class defines a task which will be executed by the scheduler.
- * 
+ *
  * How to use? Derive from it and implement the process() method.
  */
 class TaskBase
@@ -80,7 +80,10 @@ public:
      *
      * @param[in] suspended Shall the task be suspended or running at the begin? Default: suspended
      */
-    TaskBase(bool suspended = true) : m_state((true == suspended) ? (STATE_SUSPENDED) : (STATE_RUNNING)), m_signal(NULL)
+    TaskBase(bool suspended = true) :
+        m_state((true == suspended) ? (STATE_SUSPENDED) : (STATE_RUNNING)),
+        m_prevState(m_state),
+        m_signal(NULL)
     {
     }
 
@@ -100,15 +103,19 @@ public:
      */
     void suspend(void)
     {
-        m_state = STATE_SUSPENDED;
+        if (STATE_SUSPENDED != m_state)
+        {
+            m_prevState = m_state;
+            m_state = STATE_SUSPENDED;
+        }
     }
 
     /**
-     * Resume the task.
+     * Resume the task. It will be in the state before it was suspended.
      */
     void resume(void)
     {
-        m_state = STATE_RUNNING;
+        m_state = m_prevState;
     }
 
     /**
@@ -134,8 +141,9 @@ public:
     }
 
 private:
-    STATE    m_state;  /**< Current task state. */
-    ISignal* m_signal; /**< Signal event to wait for. */
+    STATE    m_state;     /**< Current task state. */
+    STATE    m_prevState; /**< Previous task state. */
+    ISignal* m_signal;    /**< Signal event to wait for. */
 
     /** Don't want a copy constructor */
     TaskBase(const TaskBase& task);

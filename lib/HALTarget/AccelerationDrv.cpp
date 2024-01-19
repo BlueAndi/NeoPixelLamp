@@ -33,6 +33,7 @@
  * Includes
  *****************************************************************************/
 #include "AccelerationDrv.h"
+#include "Constants.h"
 
 /******************************************************************************
  * Compiler Switches
@@ -77,7 +78,7 @@ void AccelerationDrv::getAcceleration(sensors_vec_t& acceleration)
     }
 }
 
-float AccelerationDrv::getAbsAcceleration(sensors_vec_t* acceleration)
+float AccelerationDrv::getAbsAcceleration(const sensors_vec_t* acceleration)
 {
     sensors_vec_t acc;
 

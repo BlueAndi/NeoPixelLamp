@@ -25,7 +25,7 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Mode handling task
+ * @brief  Motion task
  * @author Andreas Merkle <web@blue-andi.de>
  *
  * @addtogroup Application
@@ -33,8 +33,8 @@
  * @{
  */
 
-#ifndef TASK_MODE_HANDLER_H
-#define TASK_MODE_HANDLER_H
+#ifndef TASK_MOTION_H
+#define TASK_MOTION_H
 
 /******************************************************************************
  * Compile Switches
@@ -53,14 +53,36 @@
  * Types and Classes
  *****************************************************************************/
 
+/**
+ * This type defines the different orientation states.
+ * That means how the lamp is oriented in relation to earth ground.
+ */
+typedef enum
+{
+    ORIENTATION_UNKNOWN = 0,        /**< Unknown orientation */
+    ORIENTATION_VERTICAL_ON_BOTTOM, /**< Vertical orientation on bottom */
+    ORIENTATION_VERTICAL_ON_HEAD,   /** Vertical orientation on head */
+    ORIENTATION_HORIZONTAL          /**< Horizontal orientation */
+
+} Orientation;
+
+/** This type defines the different rotation states. */
+typedef enum
+{
+    ROTATION_NO = 0,   /**< No rotation */
+    ROTATION_POSITIVE, /**< Positive rotation */
+    ROTATION_NEGATIVE  /**< Negative Rotation */
+
+} Rotation;
+
 /******************************************************************************
  * Functions
  *****************************************************************************/
 
 /**
- * Mode handler task related.
+ * Motion task related.
  */
-namespace TaskModeHandler
+namespace TaskMotion
 {
     /**
      * Get the task.
@@ -70,11 +92,27 @@ namespace TaskModeHandler
     TaskBase* getTask();
 
     /**
-     * Restart current mode.
+     * Get lamp orientation state.
+     *
+     * @return Orientation
      */
-    void restartMode();
+    Orientation getOrientation();
 
-}; /* namespace TaskModeHandler */
+    /**
+     * Get lamp rotation state.
+     *
+     * @return Rotation
+     */
+    Rotation getRotation();
 
-#endif /* TASK_MODE_HANDLER_H */
+    /**
+     * Is a lamp shake detected?
+     * 
+     * @return If lamp shake is detected, it will return true otherwise false.
+     */
+    bool isShakeDetected();
+
+}; /* namespace TaskMotion */
+
+#endif /* TASK_MOTION_H */
 /** @} */

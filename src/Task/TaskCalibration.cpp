@@ -25,18 +25,17 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Mode: Color
+ * @brief  Calibration task
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include "ModeColor.h"
+#include "TaskCalibration.h"
+#include <TTask.h>
 #include <Board.h>
-
-#include "TaskMotion.h"
-#include "ColorWheel.h"
+#include <StatisticValue.hpp>
 
 /******************************************************************************
  * Compiler Switches
@@ -50,128 +49,27 @@
  * Types and classes
  *****************************************************************************/
 
-/**
- * This class handles mode Rainbow within a state machine.
- * It shows the user selected color (turn the lamp to choose).
- */
-class ModeColorState : public IState
-{
-public:
-    /**
-     * Construct the mode.
-     */
-    ModeColorState() : IState(), m_colorWheelIndex(0U)
-    {
-    }
-
-    /**
-     * Destroy the mode.
-     */
-    ~ModeColorState()
-    {
-    }
-
-    /**
-     * If the state is entered, this method will called once.
-     */
-    void entry() final;
-
-    /**
-     * Processing the state.
-     *
-     * @param[in] sm State machine, which is calling this state.
-     */
-    void process(StateMachine& sm) final;
-
-    /**
-     * If the state is left, this method will be called once.
-     */
-    void exit() final;
-
-private:
-    uint8_t m_colorWheelIndex; /**< Color wheel index. */
-
-    /** Copy constructor now allowed. */
-    ModeColorState(const ModeColorState& other);
-
-    /** Assignment operator now allowed. */
-    ModeColorState& operator=(const ModeColorState& other);
-
-    /**
-     * Show colors on pixel strip.
-     */
-    void show();
-};
-
-void ModeColorState::entry()
-{
-    show();
-}
-
-void ModeColorState::process(StateMachine& sm)
-{
-    bool hasChanged = false;
-
-    /* The lamp shall stand on the bottom. */
-    if (ORIENTATION_VERTICAL_ON_BOTTOM == TaskMotion::getOrientation())
-    {
-        /* If the lamp is turned right, the color wheel position increases. */
-        if (ROTATION_POSITIVE == TaskMotion::getRotation())
-        {
-            ++m_colorWheelIndex; /* Wrap around by intention. */
-            hasChanged = true;
-        }
-        /* If the lamp is turned left, the color wheel position decreases */
-        else if (ROTATION_NEGATIVE == TaskMotion::getRotation())
-        {
-            --m_colorWheelIndex; /* Wrap around by intention. */
-            hasChanged = true;
-        }
-        /* Nothing to do */
-        else
-        {
-            ;
-        }
-    }
-
-    if (true == hasChanged)
-    {
-        show();
-    }
-}
-
-void ModeColorState::exit()
-{
-    Adafruit_NeoPixel& neoPixel = Board::getInstance().getPixelDrv();
-
-    neoPixel.clear();
-    neoPixel.show();
-}
-
-void ModeColorState::show()
-{
-    Adafruit_NeoPixel& neoPixel = Board::getInstance().getPixelDrv();
-    uint8_t            run;
-
-    for (run = 0; run < neoPixel.numPixels(); ++run)
-    {
-        /* Turn every third pixel on */
-        neoPixel.setPixelColor(run, ColorWheel::turn(m_colorWheelIndex));
-    }
-
-    neoPixel.show();
-}
-
 /******************************************************************************
  * Prototypes
  *****************************************************************************/
+
+static void taskFunc(void* par);
 
 /******************************************************************************
  * Local Variables
  *****************************************************************************/
 
-/** Mode instance. */
-static ModeColorState gMode;
+/** Task to show calibration information on the serial console. */
+static TTask gTask(taskFunc, nullptr, 20U, true);
+
+/** Average calculation of the acceleration on x-axis. */
+static StatisticValue<float, 5U> gAccXAvg(0.0F);
+
+/** Average calculation of the acceleration on y-axis. */
+static StatisticValue<float, 5U> gAccYAvg(0.0F);
+
+/** Average calculation of the acceleration on z-axis. */
+static StatisticValue<float, 5U> gAccZAvg(0.0F);
 
 /******************************************************************************
  * Public Methods
@@ -189,11 +87,54 @@ static ModeColorState gMode;
  * External Functions
  *****************************************************************************/
 
-IState* ModeColor::getState()
+TaskBase* TaskCalibration::getTask()
 {
-    return &gMode;
+    return &gTask;
 }
 
 /******************************************************************************
  * Local Functions
  *****************************************************************************/
+
+/**
+ * Console output for calibration.
+ *
+ * @param[in] par   Task parameter
+ */
+static void taskFunc(void* par)
+{
+    Board&           board   = Board::getInstance();
+    AccelerationDrv& accDrv  = board.getAccelerationSensor();
+    GyroscopeDrv&    gyroDrv = board.getGyroscopeSensor();
+    sensors_vec_t    acceleration;
+    sensors_vec_t    gyro;
+    unsigned long    timestamp       = millis();
+
+    board.process();
+
+    accDrv.getAcceleration(acceleration);
+    gyroDrv.getGyro(gyro);
+
+    gAccXAvg.update(acceleration.x);
+    gAccYAvg.update(acceleration.y);
+    gAccZAvg.update(acceleration.z);
+
+    /* Using teleplot to visualization: https://github.com/nesnes/teleplot */
+    Serial.print(">accX:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(gAccXAvg.getAvg(), 2);
+    Serial.println(":m/s^2");
+
+    Serial.print(">accY:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(gAccYAvg.getAvg(), 2);
+    Serial.println(":m/s^2y");
+
+    Serial.print(">accZ:");
+    Serial.print(timestamp);
+    Serial.print(":");
+    Serial.print(gAccZAvg.getAvg(), 2);
+    Serial.println(":m/s^2");
+}

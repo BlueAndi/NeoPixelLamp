@@ -25,19 +25,19 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  User interface task
+ * @brief  Brightness control task
  * @author Andreas Merkle <web@blue-andi.de>
  */
 
 /******************************************************************************
  * Includes
  *****************************************************************************/
-#include "TaskUI.h"
+#include "TaskBrightness.h"
 #include <TTask.h>
 #include <Board.h>
 #include <Constants.h>
 
-#include "TaskModeHandler.h"
+#include "TaskMotion.h"
 
 /******************************************************************************
  * Compiler Switches
@@ -56,13 +56,13 @@
  *****************************************************************************/
 
 static void taskFunc(void* par);
-static void controlBrightness(float absAcc, float accZ, float gyroZ);
+static void controlBrightness(Orientation orientation, Rotation rotation);
 
 /******************************************************************************
  * Local Variables
  *****************************************************************************/
 
-/** Task handles the main user interface. */
+/** Task handles the lamp brightness. */
 static TTask gTask(taskFunc, nullptr, 20U, false);
 
 /******************************************************************************
@@ -81,7 +81,7 @@ static TTask gTask(taskFunc, nullptr, 20U, false);
  * External Functions
  *****************************************************************************/
 
-TaskBase* TaskUI::getTask()
+TaskBase* TaskBrightness::getTask()
 {
     return &gTask;
 }
@@ -91,106 +91,60 @@ TaskBase* TaskUI::getTask()
  *****************************************************************************/
 
 /**
- * The task function handles the main user interface.
+ * The task function handles the lamp brightness.
  *
  * @param[in] par   Task parameter
  */
 static void taskFunc(void* par)
 {
-    Board&           board           = Board::getInstance();
-    AccelerationDrv& accDrv          = board.getAccelerationSensor();
-    GyroscopeDrv&    gyroDrv         = board.getGyroscopeSensor();
-    float            absAcceleration = 0.0F;
-    float            absAccelDiff    = 0.0F;
-    sensors_vec_t    accelerationVec;
-    sensors_vec_t    gyroscopeVec;
-    const float      MODE_CHANGE_THRESHOLD = 4.0F; /* Acceleration threshold in m/s^2, which triggers a mode change. */
-
-    board.process();
-
-    accDrv.getAcceleration(accelerationVec);
-    gyroDrv.getGyro(gyroscopeVec);
-
-    absAcceleration = accDrv.getAbsAcceleration(&accelerationVec);
-    absAccelDiff    = fabs(absAcceleration - Constants::earthGravity);
+    Orientation orientation = TaskMotion::getOrientation();
+    Rotation    rotation    = TaskMotion::getRotation();
 
     /* Control brightness */
-    controlBrightness(absAcceleration, accelerationVec.z, gyroscopeVec.z);
-
-    /* Does the user request a mode change by shaking the lamp? */
-    if ((MODE_CHANGE_THRESHOLD <= absAccelDiff) &&            /* Lamp shall be shaked with a min. acceleration */
-        (1.0F > fabs(absAcceleration - accelerationVec.z)) && /* Lamp shall be shaked along the z-axis */
-        (20.0F > fabs(gyroscopeVec.x)) &&                     /* Lamp shall not be rotated at all */
-        (20.0F > fabs(gyroscopeVec.y)) && (20.0F > fabs(gyroscopeVec.z)))
-    {
-        TaskModeHandler::selectNextMode();
-    }
+    controlBrightness(orientation, rotation);
 }
 
 /**
- * Control the NeoPixel ring LEDs brightness by rotating the lamp
- * around z-axis. The z-axis must be horizontal to earth.S
+ * Control the pixel brightness by rotating the lamp around z-axis. The z-axis
+ * must be horizontal to earth.
  *
- * @param[in] absAcc    Absolute acceleration value in m/s^2
- * @param[in] accZ      Acceleration along the z-axis in m/s^2
- * @param[in] gyroZ     Angle speed around the z-axis in degree/s
+ * @param[in] orientation   The lamp orientation state.
+ * @param[in] rotation      The lamp rotation state.
  */
-static void controlBrightness(float absAcc, float accZ, float gyroZ)
+static void controlBrightness(Orientation orientation, Rotation rotation)
 {
-    Adafruit_NeoPixel& neoPixel             = Board::getInstance().getPixelDrv();
-    const float        MIN_ANGULAR_VELOCITY = 20.0F;
-    const float        MIN_ACCELERATION     = 1.6F;
-    const float        MIN_ABS_ACCELERATION = Constants::earthGravity - 1.6F;
-    uint8_t            brightness           = 0;
-    bool               hasChanged           = false;
+    if (ORIENTATION_HORIZONTAL == orientation)
+    {
+        Adafruit_NeoPixel& neoPixel   = Board::getInstance().getPixelDrv();
+        uint8_t            brightness = neoPixel.getBrightness();
+        bool               hasChanged = false;
 
-    /* Nearly no acceleration shall take place. */
-    if (MIN_ABS_ACCELERATION < fabs(absAcc - Constants::earthGravity))
-    {
-        /* Do nothing */
-    }
-    /* The lamp shall be horizontal to earth. That means the z-axis
-     * acceleration should be low, otherwise it would be around 9.81 m/s^2.
-     */
-    else if (MIN_ACCELERATION > fabs(accZ))
-    {
-        /* If the lamp is turned right, the brightness increases. */
-        if (MIN_ANGULAR_VELOCITY < gyroZ)
+        if (ROTATION_POSITIVE == rotation)
         {
-            brightness = neoPixel.getBrightness();
-
             if (Constants::neoPixelMaxBrightness > brightness)
             {
                 ++brightness;
-
                 hasChanged = true;
             }
         }
-        /* If the lamp is turned left, the brightness decreases. */
-        else if (-MIN_ANGULAR_VELOCITY > gyroZ)
+        else if (ROTATION_NEGATIVE == rotation)
         {
-            brightness = neoPixel.getBrightness();
-
             if (Constants::neoPixelMinBrightness < brightness)
             {
                 --brightness;
-
                 hasChanged = true;
             }
         }
-        /* Nothing to do */
         else
         {
+            /* Nothing to do */
             ;
         }
-    }
 
-    if (true == hasChanged)
-    {
-        Serial.print("Change brightness to ");
-        Serial.println(brightness);
-
-        neoPixel.setBrightness(brightness);
-        neoPixel.show();
+        if (true == hasChanged)
+        {
+            neoPixel.setBrightness(brightness);
+            neoPixel.show();
+        }
     }
 }

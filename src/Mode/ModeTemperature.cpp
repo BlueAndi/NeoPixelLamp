@@ -163,7 +163,7 @@ void ModeTemperatureState::process(StateMachine& sm)
     addTemperature(temperature);
     temperatureAvg = getTemperatureAvg();
 
-    if (TEMPERATURE_DIFF_THRESHOLD <= fabs(m_lastTemperature - temperatureAvg))
+    if (TEMPERATURE_DIFF_THRESHOLD <= fabsf(m_lastTemperature - temperatureAvg))
     {
         uint16_t run;
         float    fNormalizedTemperature = (temperatureAvg - Constants::temperatureMin) /

@@ -25,7 +25,7 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  Mode handling task
+ * @brief  Brightness control task
  * @author Andreas Merkle <web@blue-andi.de>
  *
  * @addtogroup Application
@@ -33,8 +33,8 @@
  * @{
  */
 
-#ifndef TASK_MODE_HANDLER_H
-#define TASK_MODE_HANDLER_H
+#ifndef TASK_BRIGHTNESS_H
+#define TASK_BRIGHTNESS_H
 
 /******************************************************************************
  * Compile Switches
@@ -58,9 +58,9 @@
  *****************************************************************************/
 
 /**
- * Mode handler task related.
+ * Brightness control task related.
  */
-namespace TaskModeHandler
+namespace TaskBrightness
 {
     /**
      * Get the task.
@@ -69,12 +69,7 @@ namespace TaskModeHandler
      */
     TaskBase* getTask();
 
-    /**
-     * Restart current mode.
-     */
-    void restartMode();
+}; /* namespace TaskBrightness */
 
-}; /* namespace TaskModeHandler */
-
-#endif /* TASK_MODE_HANDLER_H */
+#endif /* TASK_BRIGHTNESS_H */
 /** @} */

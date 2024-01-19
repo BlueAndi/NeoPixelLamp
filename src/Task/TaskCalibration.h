@@ -25,7 +25,7 @@
     DESCRIPTION
 *******************************************************************************/
 /**
- * @brief  User interface task
+ * @brief  Calibration task
  * @author Andreas Merkle <web@blue-andi.de>
  *
  * @addtogroup Application
@@ -33,8 +33,8 @@
  * @{
  */
 
-#ifndef TASK_UI_H
-#define TASK_UI_H
+#ifndef TASK_CALIBRATION_H
+#define TASK_CALIBRATION_H
 
 /******************************************************************************
  * Compile Switches
@@ -58,9 +58,9 @@
  *****************************************************************************/
 
 /**
- * User interface task related.
+ * Calibration task related.
  */
-namespace TaskUI
+namespace TaskCalibration
 {
     /**
      * Get the task.
@@ -69,7 +69,7 @@ namespace TaskUI
      */
     TaskBase* getTask();
 
-}; /* namespace TaskUI */
+}; /* namespace TaskCalibration */
 
-#endif /* TASK_UI_H */
+#endif /* TASK_CALIBRATION_H */
 /** @} */
